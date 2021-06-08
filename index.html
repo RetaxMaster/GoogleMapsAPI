@@ -23,7 +23,7 @@
     <div id="map"></div>
     
     <script async
-        src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=API-KEY&callback=initMap">
     </script>
 
     <script>
@@ -50,21 +50,55 @@
 
         }
 
+        // Aquí puedo empezar a trabajar con Google Maps
         async function initMap() {
 
+            // Agrego estos métodos a la clase LatLngBounds ya que solo tiene 2, las necesito para obtener el viewport del mapa
+
+            google.maps.LatLngBounds.prototype.getNorthWest = function() {
+                const lat = this.toJSON().north;
+                const lng = this.toJSON().west;
+                return new google.maps.LatLng(lat, lng);
+            }
+
+            google.maps.LatLngBounds.prototype.getSouthEast = function() {
+                const lat = this.toJSON().south;
+                const lng = this.toJSON().east;
+                return new google.maps.LatLng(lat, lng);
+            }
+
+            
+
+
+
+
+
             const geocoder = new google.maps.Geocoder();
+            // const maxZoomService = new google.maps.MaxZoomService();
+            let zoom = 14;
 
             const place = await geocoder.geocode({
-                "address": "Alamenda Central, Ciudad de México"
+                "address": "Alameda central, Ciudad de México"
             });
 
             console.log("Place info: ", place);
 
             const coords = place.results[0].geometry.location;
 
+
+            /* maxZoomService.getMaxZoomAtLatLng(coords, (result) => {
+                if (result.status !== "OK") {
+                    console.error("No se pudo encontrar el max zoom, usando el zoom " + zoom);
+                } else {
+                    console.log("Zoom: " + result.zoom);
+                    zoom = result.zoom;
+                }
+            }); */
+
+
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: coords,
-                zoom: 20,
+                zoom: zoom,
             });
 
             let marker = new google.maps.Marker({
@@ -72,20 +106,47 @@
                 map: map,
             });
 
+            setTimeout(() => {
+
+                
+
+            }, 1000);
+
     
             // Así se puede poner un marcador al hacer click
-            /* map.addListener("click", function(e) {
+            map.addListener("click", function(e) {
 
                 console.log("Click event: ", e);
                 console.log("Coords: ", e.latLng.lat(), e.latLng.lng());
 
                 // Esto agrega un marcador donde el usuario clicó
-                let marker = new google.maps.Marker({
+                /* let marker = new google.maps.Marker({
                     position: e.latLng,
+                    map: map,
+                });  */
+
+
+                const bermudaTriangle = new google.maps.Polygon({
+                    paths: [
+                        map.getBounds().getNorthEast(),
+                        map.getBounds().getNorthWest(),
+                        map.getBounds().getSouthWest(),
+                        map.getBounds().getSouthEast(),
+                    ],
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#FF0000",
+                    fillOpacity: 0.35,
                     map: map,
                 });
 
-            }); */
+
+                const isThere = google.maps.geometry.poly.containsLocation(e.latLng, bermudaTriangle);
+
+                console.log(isThere);
+
+            });
 
             // Agregando un triángulo
 
@@ -113,6 +174,23 @@
                 draggable: false, */
             });
 
+
+            // Di oder coud
+            /* circuloTrabajo = new google.maps.Circle({
+                strokeColor: '#4d90fe',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#4d90fe',
+                fillOpacity: 0.35,
+                map: map,
+                draggable: false,
+                clickable: false,
+                editable: false,
+                center: {lat: <?php echo $latitud.', lng:'.$longitud ?>},
+                radius: 75,
+                suppressUndo: true
+            }); */
+
            
 
             // Podemos reobtener el radio del circulo, incluso si es editado
@@ -137,7 +215,9 @@
 
 
             // Así podemos ver si un punto está dentro de un circulo
-            map.addListener("click", function(e) {
+            /* map.addListener("click", function(e) {
+
+                console.log(e);
 
                 const a = cityCircle.getCenter();
                 const b = new google.maps.LatLng(19.387954449121207, -99.17680549504637);
@@ -164,11 +244,11 @@
 
 
                 // Básicamente obtiene la distancia entre el punto al cual le di click y el centro del circulo que me interesa. Si esta distancia es mayor que el radio de mi circulo pues es que el punto no está dentro del área
-                /* const contains = google.maps.geometry.spherical.computeDistanceBetween(e.latLng, cityCircle.getCenter()) <= cityCircle.getRadius();
+                // const contains = google.maps.geometry.spherical.computeDistanceBetween(e.latLng, cityCircle.getCenter()) <= cityCircle.getRadius();
 
-                console.log(contains); */
+                // console.log(contains);
 
-            });
+            }); */
 
 
         }
